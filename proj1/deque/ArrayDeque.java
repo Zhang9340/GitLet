@@ -133,18 +133,5 @@ public class ArrayDeque<T> {
         return this.size == 0;
     }
 
-    public static void main(String[] args) {
-        ArrayDeque<Integer>a =new ArrayDeque<>();
-       for(int i=0; i<15;i++){
-        a.addFirst(i);}
-
-        a.removeFirst();
-        a.removeFirst();
-        a.removeFirst();
-        a.removeFirst();
-        a.removeFirst();
-        a.removeFirst();
-        a.removeFirst();
-
-    }
+ 
 }
