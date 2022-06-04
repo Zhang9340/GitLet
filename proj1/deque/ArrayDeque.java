@@ -156,14 +156,5 @@ public class ArrayDeque<T>implements Deque<T>{
         return this.size == 0;
     }
 
-    public static void main(String[] args) {
-        ArrayDeque<Integer> a =new ArrayDeque<>();
-        LinkedList<Integer> b =new LinkedList<>();
 
-
-        if (Objects.equals(a.removeLast(), b.removeLast())){
-            System.out.println(true);
-        }
-
-    }
 }
