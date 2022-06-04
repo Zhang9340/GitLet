@@ -136,4 +136,31 @@ public class LinkedListDequeTest {
 
 
     }
+
+    @Test
+    /* Test get and getRecursive methods */
+    public void getTest(){
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        lld2.addFirst(1);
+        lld2.addFirst(2);
+        lld2.addFirst(4);
+        lld2.addFirst(8);
+
+        Integer getNum2 = lld2.get(0);
+        Integer getRecursiveNum2 = lld2.getRecursive(0);
+        assertEquals(8, (long)getNum2);
+        assertEquals(8, (long)getRecursiveNum2);
+
+        Integer getNum1 = lld2.get(1);
+        Integer getRecursiveNum1 = lld2.getRecursive(1);
+        assertEquals(4, (long)getNum1);
+        assertEquals(4, (long)getRecursiveNum1);
+
+        assertEquals(null, lld2.get(-1));
+        assertEquals(null, lld2.get(100));
+        assertEquals(null, lld2.getRecursive(-1));
+        assertEquals(null, lld2.getRecursive(100));
+
+    }
+
 }

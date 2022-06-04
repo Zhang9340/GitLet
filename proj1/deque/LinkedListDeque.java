@@ -2,7 +2,7 @@ package deque;
 
 
 
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T>implements Deque<T> {
     private static class node<T>{
         public  T item;
         public  node<T> next;
@@ -27,17 +27,19 @@ public class LinkedListDeque<T> {
 
         size=0;
     }
-
+ @Override
     public void addFirst(T x){
         sentinel.next=new node<>(sentinel,x,sentinel.next);
         sentinel.next.next.prev=sentinel.next;
         size+=1;
     }
+    @Override
     public void addLast(T x){
         sentinel.prev=new node<>(sentinel.prev,x,sentinel);
         sentinel.prev.prev.next= sentinel.prev;
         size+=1;
     }
+    @Override
     public T removeFirst(){
         if (isEmpty()){
             return null;
@@ -56,6 +58,7 @@ public class LinkedListDeque<T> {
             return removedNode.item;
         }
     }
+    @Override
     public T removeLast(){
         if (isEmpty()){
             return null;
@@ -67,17 +70,20 @@ public class LinkedListDeque<T> {
             size-=1;
             return removedNode.item;
         }else {
-            node<T> removedNode= sentinel.next;
+            node<T> removedNode= sentinel.prev;
             sentinel.prev.prev.next=sentinel;
             sentinel.prev=sentinel.prev.prev;
             size-=1;
             return removedNode.item;
         }
     }
+    @Override
     public boolean isEmpty(){
         return size == 0;
     }
+    @Override
     public int size(){return size;}
+    @Override
     public T get(int index){
         if (index >= size || index < 0){
             return null;
@@ -113,7 +119,7 @@ public class LinkedListDeque<T> {
             sentinel=sentinel.next;
         }
     }
-
+    @Override
     public void printDeque() {
         if (isEmpty()){
             System.out.println();
