@@ -1,9 +1,8 @@
 package deque;
 
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.Iterator;
 
-public class ArrayDeque<T>implements Deque<T>{
+public class ArrayDeque<T>implements Deque<T>,Iterable<T>{
     private int size;
     private T[] items;
     private int nextFirst;
@@ -36,6 +35,9 @@ public class ArrayDeque<T>implements Deque<T>{
     }
     @Override
     public void addFirst(T x){
+        if (x==null){
+            throw new IllegalArgumentException("cannot be null");
+        }
         if(isEmpty()){
           items[nextFirst]=x;
           nextFirst=(nextFirst+ items.length-1)%items.length;
@@ -56,6 +58,9 @@ public class ArrayDeque<T>implements Deque<T>{
     }
     @Override
     public void addLast(T x){
+        if (x==null){
+            throw new IllegalArgumentException("cannot be null");
+        }
         if(isEmpty()){
             items[nextLast]=x;
             nextLast=(nextLast+1)%items.length;
@@ -137,7 +142,6 @@ public class ArrayDeque<T>implements Deque<T>{
        int realIndex=(nextFirst+index+1)% items.length;
 
 
-
      return items[realIndex];
     }
 
@@ -157,4 +161,36 @@ public class ArrayDeque<T>implements Deque<T>{
     }
 
 
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrDequeIterator();
+    }
+    private class ArrDequeIterator implements Iterator<T>{
+        private int wizPos;
+        @Override
+        public boolean hasNext() {
+            return wizPos<size;
+        }
+
+        @Override
+        public T next() {
+            T returnItem=get(wizPos);
+            wizPos+=1;
+            return returnItem;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o==null){return false;}
+        if (this==o){return true;}
+        if (!(o instanceof Deque) ||  ((Deque<?>) o).size()!=this.size){return false;}
+        Deque<T> object= (Deque<T>) o;
+        for (int i = 0; i <size ; i++) {
+            if (this.get(i)!=object.get(i)){
+                return false;
+            }
+        }
+        return true;
+    }
 }

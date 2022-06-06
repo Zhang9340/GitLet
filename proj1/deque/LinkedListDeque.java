@@ -1,8 +1,10 @@
 package deque;
 
 
+import java.util.Iterator;
 
-public class LinkedListDeque<T>implements Deque<T> {
+public class LinkedListDeque<T>implements Deque<T>,Iterable<T> {
+
     private static class node<T>{
         public  T item;
         public  node<T> next;
@@ -29,12 +31,18 @@ public class LinkedListDeque<T>implements Deque<T> {
     }
  @Override
     public void addFirst(T x){
+     if (x==null){
+         throw new IllegalArgumentException("cannot be null");
+     }
         sentinel.next=new node<>(sentinel,x,sentinel.next);
         sentinel.next.next.prev=sentinel.next;
         size+=1;
     }
     @Override
     public void addLast(T x){
+        if (x==null){
+            throw new IllegalArgumentException("cannot be null");
+        }
         sentinel.prev=new node<>(sentinel.prev,x,sentinel);
         sentinel.prev.prev.next= sentinel.prev;
         size+=1;
@@ -83,6 +91,19 @@ public class LinkedListDeque<T>implements Deque<T> {
     }
     @Override
     public int size(){return size;}
+    @Override
+    public boolean equals(Object o){
+        if (o==null){return false;}
+        if (this==o){return true;}
+        if (!(o instanceof Deque) || ((Deque<?>) o).size()!=this.size){return false;}
+        Deque<T> other =(Deque<T>) o;
+        for (int i = 0; i < size; i++) {
+            if (other.get(i)!=this.get(i)){
+                return false;
+            }
+        }
+        return true;
+    }
     @Override
     public T get(int index){
         if (index >= size || index < 0){
@@ -134,6 +155,30 @@ public class LinkedListDeque<T>implements Deque<T> {
         }
 
     }
+    @Override
+    public Iterator<T> iterator() {
+        return new DequeIterator();
+    }
+    private class DequeIterator implements Iterator<T>{
+        private int wizPos;
+        private node<T> currNode=sentinel.next;
+
+        public boolean hasNext() {
+            return wizPos<size;
+        }
+
+        public T next() {
+            T returnItem= currNode.item;
+            currNode=currNode.next;
+            wizPos+=1;
+            if (wizPos==size){
+                findSentinel();
+            }
+            return returnItem;
+        }
+    }
+
+
 
 
 }

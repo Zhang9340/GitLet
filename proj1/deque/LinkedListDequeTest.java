@@ -162,5 +162,55 @@ public class LinkedListDequeTest {
         assertEquals(null, lld2.getRecursive(100));
 
     }
+    @Test
+    /* Test equal method */
+    public void equalTest(){
+        //
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        lld1.addFirst(1);
+        lld1.addFirst(2);
+        lld1.addFirst(4);
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        lld2.addFirst(1);
+        lld2.addFirst(2);
+        lld2.addFirst(4);
+        LinkedListDeque<Integer> lld3 = new LinkedListDeque<>();
+        lld3.addFirst(1);
+        lld3.addLast(2);
+        lld3.addFirst(4);
+        assertTrue("should return true", lld1.equals(lld2));
+        assertFalse("should return false", lld1.equals(lld3));
+
+        lld2.removeFirst();
+        assertFalse("shoud return false", lld1.equals(lld2));
+
+        //
+
+    }
+    @Test
+    /* Test printDeque method */
+    public void printDequeTest(){
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        lld2.addFirst(1);
+        lld2.addFirst(2);
+        lld2.addFirst(4);
+
+        String corrStr = new String("4 2 1");
+        lld2.printDeque();
+
+    }
+    @Test
+    /* Test iterator (enhanced for loop) */
+    public void iteratorTest(){
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        lld2.addFirst(1);
+        lld2.addFirst(2);
+        lld2.addFirst(4);
+        lld2.addFirst(8);
+        int i = 0;
+        for (Integer item:lld2){
+            assertEquals((long)lld2.get(i++), (long)item);
+        }
+    }
 
 }

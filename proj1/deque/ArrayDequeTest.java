@@ -136,9 +136,9 @@ public class ArrayDequeTest {
         }
     }
 
-  // @Test
+   @Test
     /* Test equal method */
-    /* public void equalTest(){
+     public void equalTest(){
         //
         ArrayDeque<Integer> lld1 = new ArrayDeque<>();
         lld1.addFirst(1);
@@ -164,7 +164,8 @@ public class ArrayDequeTest {
         ad1.addFirst(2);
         ad1.addFirst(4);
         assertTrue("should return true", lld1.equals(ad1));
-    }*/
+        assertTrue("should return true", ad1.equals(lld1));
+    }
 
     @Test
     /* Test printDeque method */
@@ -199,9 +200,9 @@ public class ArrayDequeTest {
 
     }
 
-    //@Test
+    @Test
     /* Test iterator (enhanced for loop) */
-   /* public void iteratorTest(){
+   public void iteratorTest(){
         ArrayDeque<Integer> lld2 = new ArrayDeque<>();
         lld2.addFirst(1);
         lld2.addFirst(2);
@@ -211,7 +212,7 @@ public class ArrayDequeTest {
         for (Integer item:lld2){
             assertEquals((long)lld2.get(i++), (long)item);
         }
-    }*/
+    }
 
     @Test
     /* randomized tests */
