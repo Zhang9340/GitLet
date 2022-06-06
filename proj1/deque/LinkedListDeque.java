@@ -20,8 +20,8 @@ public class LinkedListDeque<T>implements Deque<T>,Iterable<T> {
     private   node<T> sentinel;
     private int size;
 
+    /* create empty list */
 
-   /* create empty list */
     public LinkedListDeque(){
         sentinel= new node<>(null, null , null);
         sentinel.next= sentinel;
@@ -85,10 +85,7 @@ public class LinkedListDeque<T>implements Deque<T>,Iterable<T> {
             return removedNode.item;
         }
     }
-    @Override
-    public boolean isEmpty(){
-        return size == 0;
-    }
+
     @Override
     public int size(){return size;}
     @Override
@@ -98,7 +95,8 @@ public class LinkedListDeque<T>implements Deque<T>,Iterable<T> {
         if (!(o instanceof Deque) || ((Deque<?>) o).size()!=this.size){return false;}
         Deque<T> other =(Deque<T>) o;
         for (int i = 0; i < size; i++) {
-            if (other.get(i)!=this.get(i)){
+
+            if (!other.get(i).equals(this.get(i))){
                 return false;
             }
         }
@@ -174,12 +172,7 @@ public class LinkedListDeque<T>implements Deque<T>,Iterable<T> {
             if (wizPos==size){
                 findSentinel();
             }
-            return returnItem;
-        }
+            return returnItem;}
     }
-
-
-
-
 }
 

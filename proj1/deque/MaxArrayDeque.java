@@ -16,7 +16,7 @@ public class MaxArrayDeque<T> extends ArrayDeque<T>  {
         }
         for (T item: this
              ) {
-            if (comparator.compare(maxItem,item)>0){
+            if (comparator.compare(maxItem,item)<0){
                 maxItem = item;
             }
             
@@ -31,7 +31,7 @@ public class MaxArrayDeque<T> extends ArrayDeque<T>  {
         }
         for (T item: this
         ) {
-            if (c.compare(maxItem,item)>0){
+            if (c.compare(maxItem,item)<0){
                 maxItem = item;
             }
 

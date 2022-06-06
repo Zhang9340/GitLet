@@ -155,10 +155,6 @@ public class ArrayDeque<T>implements Deque<T>,Iterable<T>{
         nextLast=size;
 
     }
-    @Override
-    public boolean isEmpty() {
-        return this.size == 0;
-    }
 
 
     @Override
@@ -187,7 +183,7 @@ public class ArrayDeque<T>implements Deque<T>,Iterable<T>{
         if (!(o instanceof Deque) ||  ((Deque<?>) o).size()!=this.size){return false;}
         Deque<T> object= (Deque<T>) o;
         for (int i = 0; i <size ; i++) {
-            if (this.get(i)!=object.get(i)){
+            if (!this.get(i).equals(object.get(i))){
                 return false;
             }
         }

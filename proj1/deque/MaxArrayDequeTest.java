@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,59 +27,16 @@ public class MaxArrayDequeTest {
     }
 
     @Test
-    /* randomized tests */
-    public void randomizedTest(){
-        MaxArrayDeque<Integer> lld = new MaxArrayDeque<>(new myComparator1());
-        LinkedList<Integer> benchMarkLld = new LinkedList<>();
 
-        int N = 40000;
-        int randVal;
-        for (int i = 0; i < N; i += 1) {
-            int operationNumber = StdRandom.uniform(0, 6);
-            switch (operationNumber){
-                // addFirst
-                case 0:
-                    randVal = StdRandom.uniform(0, 100);
-                    lld.addFirst(randVal);
-                    benchMarkLld.addFirst(randVal);
-                    System.out.println("addLast(" + randVal + ")");
-                    break;
-                // addLast
-                case 1:
-                    randVal = StdRandom.uniform(0, 100);
-                    lld.addLast(randVal);
-                    benchMarkLld.addLast(randVal);
-                    System.out.println("addLast(" + randVal + ")");
-                    break;
-                // removeFirst
-                case 2:
-                    if (lld.size() == 0 || benchMarkLld.size() == 0){
-                        continue;
-                    }
-                    assertEquals(benchMarkLld.removeFirst(), lld.removeFirst());
-                    break;
-                // removeLast
-                case 3:
-                    if (lld.size() == 0 || benchMarkLld.size() == 0){
-                        continue;
-                    }
-                    assertEquals(benchMarkLld.removeLast(), lld.removeLast());
-                    break;
-                // get
-                case 4:
-                    if (lld.size() == 0 || benchMarkLld.size() == 0){
-                        continue;
-                    }
-                    randVal = StdRandom.uniform(0, benchMarkLld.size());
-                    assertEquals(benchMarkLld.get(randVal), lld.get(randVal));
-                    break;
-                // size
-                case 5:
-                    assertEquals(lld.size(), benchMarkLld.size());
-                    break;
-                default:
-                    break;
-            }
+    public void Max_test(){
+        myComparator1<Integer> c1=new myComparator1<>();
+        myComparator2<Integer>c2 =new myComparator2<>();
+        MaxArrayDeque<Integer> a =new MaxArrayDeque<>(c1);
+        for (int i = 0; i <10 ; i++) {
+            a.addFirst(i);
         }
+        assertEquals(9,a.max(),0);
+        assertEquals( a.max(c2), a.max(),0);
+
     }
 }
