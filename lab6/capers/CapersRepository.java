@@ -83,7 +83,7 @@ public class CapersRepository {
         File dogFile =Utils.join(CAPERS_FOLDER.getPath(),"dogs", name);
         Dog dog = Dog.fromFile(name);
         dog.haveBirthday();
-       // dog.saveDog();
+        dog.saveDog();
 
     }
 }

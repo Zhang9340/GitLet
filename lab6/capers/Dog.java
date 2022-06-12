@@ -65,9 +65,7 @@ public class Dog implements Serializable { // TODO
         // TODO (hint: don't forget dog names are unique)
         File dogFile= Utils.join(DOG_FOLDER.getPath(),name);
         Dog dog =new Dog(name,breed,age);
-        if (dogFile.exists()){
-            throw  new IllegalArgumentException("Dog name already exits");
-        }
+
         writeObject(dogFile,dog);
 
     }
