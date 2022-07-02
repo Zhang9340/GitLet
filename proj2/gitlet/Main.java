@@ -2,7 +2,7 @@ package gitlet;
 
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+ *  @author Zhiyuan
  */
 public class Main {
 
@@ -16,23 +16,17 @@ public class Main {
         Repository repository = new Repository();
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
+
                 repository.init();
 
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+
                 repository.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
-            //  handle the commit [message]
+
             case "commit":
                 repository.commit(args[1]);
-                break;
-
-            case "check":
-                repository.readfromStage();
-                repository.getTrackedFileFromCurrentcommit();
                 break;
 
 
@@ -43,6 +37,18 @@ public class Main {
 
             case"log":
                 repository.log();
+                break;
+
+            case"global-log":
+                repository.global_log();
+                break;
+
+            case "branch":
+               repository.Branch(args[1]);
+               break;
+
+            case"check":
+                repository.getStagedFile();
                 break;
 
             case"checkout":
@@ -56,21 +62,26 @@ public class Main {
                     // java gitlet.Main checkout -- [file name]
                     if (!args[1].equals("--")){
                         System.out.println("invalid operand");
+                        System.exit(0);
                     }
                     repository.checkout(args[2]);
                     break;
-                }else if (len==4){
+                }else if (len==4) {
                     //java gitlet.Main checkout [commit id] -- [file name]
-                    if (!args[2].equals("--")){
+                    if (!args[2].equals("--")) {
                         System.out.println("invalid operand");
+                        System.exit(0);
                     }
-                    repository.checkout(args[3],args[1]);
+                    repository.checkout(args[3], args[1]);
                     break;
-
+                }
+                else if  (len==2){
+                    repository.checkout_branch(args[1]);
+                    }
                 }
 
 
 
         }
     }
-}
+

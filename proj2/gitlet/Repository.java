@@ -1,15 +1,10 @@
 package gitlet;
 
 
-
-
-
-
-
-
-
 import java.io.File;
 import java.util.*;
+import java.util.stream.Stream;
+
 
 import static gitlet.Utils.*;
 
@@ -58,8 +53,7 @@ public class Repository {
      *       ->blobs [filename]
      *    ->COMMITS_DIR
      *       ->commits [commits id]
-     *    ->HEAD
-     *      -> Head->branch(the file save the content that shows which branch the Head is pointing to)
+     *    -> Head->branch(the file save the content that shows which branch the Head is pointing to)
      *    ->Branch_DIR
      *      ->master branches(the file save the content that the current branch the commit pointing to)
      *      ->other branches
@@ -108,24 +102,20 @@ public class Repository {
       Commit headCommit =getCommitFormTheHead();
       Blobs blobs=new Blobs(FileName,CWD);
       Stage stage =readObject(STAGE, Stage.class);
-      String stageBlobId=stage.getAdded().getOrDefault(FileName,"0");
+      Map<String,String> stageAddedFile=stage.getAdded();
       // from the commit that the head pointer points to get the blobId for the given filename
       String headCommitBlobId=headCommit.getBlobs().getOrDefault(FileName, "");
-      if (Objects.equals(blobs.getId(), headCommitBlobId)){
+      // find dulplicate files
+      if (Objects.equals(blobs.getId(), headCommitBlobId)
+              && checkDuplicateFile(stageAddedFile,file) ){
           System.exit(0);
       }else {
-
           //write stage and blobs object
           stage.add(FileName, blobs.getId());
-          File BlobsFile = join(BLOBS_DIR, blobs.getId());
-          writeObject(BlobsFile, blobs);
           writeObject(STAGE, stage);
       }
-
-
-
-
     }
+
     public void commit(String message){
        // read from the stage
         Stage stage= readObject(STAGE,Stage.class);
@@ -140,19 +130,19 @@ public class Repository {
         Commit parent=getCommitFormTheHead();
         Commit commit =new Commit(message,parent, stage);
         writeCommitToFile(commit);
+        // save the snapshot of the staged file
+        Map<String, String> blobs = stage.getAdded();
+        blobs.forEach((key, value) -> writeObject(join(BLOBS_DIR, value), new Blobs(key, CWD)));
+
+        // remove the file in the stage
+        stage.getAdded().clear();
+
+        writeObject(STAGE,stage);
         //change the HEAD and Branch pointer
         String branchesName= readContentsAsString(Head);
         writeContents(join(Branch,branchesName),commit.getId());
-        //TODO: remove the file in the stage
-
-        Iterator<String> iterator = stage.getAdded().keySet().iterator();
-        while (iterator.hasNext()) {
-
-            rm(iterator.next());
-        }
-
-
     }
+
     public void rm(String filename){
         File file= join(CWD,filename);
         Stage stage =readObject(STAGE,Stage.class);
@@ -175,11 +165,8 @@ public class Repository {
             restrictedDelete(filename);
         }
         writeObject(STAGE,stage);
-
-
-
-
     }
+
     public void log(){
         Commit commit=getCommitFormTheHead();
         while (commit!=null){
@@ -190,8 +177,19 @@ public class Repository {
             commit= readObject(join(COMMITS_DIR,commit.getParentsId()),Commit.class);
         }
     }
+
+    public void global_log(){
+        StringBuffer sb = new StringBuffer();
+        List<String> filename =plainFilenamesIn(COMMITS_DIR);
+        for (String file: filename){
+            File commitfile= join(COMMITS_DIR,file);
+            Commit commit =readObject(commitfile,Commit.class);
+            sb.append(commit.toString());
+        }
+        System.out.println(sb);
+    }
     // java gitlet.Main checkout -- [file name]
-   public void checkout(String filename){
+    public void checkout(String filename){
         //Takes the version of the file as it exists in the head commit and puts it in the working directory,
        // overwriting the version of the file that’s already there if there is one. The new version of the file is not staged.
        Commit commit =getCommitFormTheHead();
@@ -206,10 +204,11 @@ public class Repository {
        }
    }
     // java gitlet.Main checkout [commit id] -- [file name]
-   public void  checkout(String filename, String commitId){
+    public void  checkout(String filename, String commitId){
         //Takes the version of the file as it exists in the commit with the given id, and puts it in the working directory,
        // overwriting the version of the file that’s already there if there is one. The new version of the file is not staged.
-       File commitFile= join(COMMITS_DIR,commitId);
+       String commitIdFull=getFullId(commitId);
+       File commitFile= join(COMMITS_DIR,commitIdFull);
        if (!commitFile.exists()){
            System.out.println("No commit with that id exists.");
            System.exit(0);
@@ -220,11 +219,44 @@ public class Repository {
            System.out.println("File does not exist in that commit.");
        }else {
            Blobs blobs= getBlobsFromFile(blobId);
-           byte[] content =blobs.getContent();
+           String content =blobs.getContentAsString();
            File checkedFile =join(CWD,filename);
            writeContents(checkedFile,content);
        }
+   }
 
+    public void checkout_branch(String Branchname){
+        File Branchfile =join(Branch,Branchname);
+        if (!Branchfile.exists()){
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+       String BranchFromHead =readContentsAsString(Head);
+        if (Branchname.equals(BranchFromHead)){
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        }
+        //If a working file is untracked in the current branch and would be overwritten by the checkout,
+       // print There is an untracked file in the way; delete it, or add and commit it first. and exit
+       Commit commit =getCommitFormTheHead();
+       validUntrackedFile(commit.getBlobs());
+       // remove the files in the current CWD and replace it with the file in the commit that this branch points to
+
+       clearStage();
+       removeAllFilesInCWD();
+       WriteFilesFromCommit(Branchname);
+       writeContents(Head, Branchname);
+   }
+
+    public void Branch(String branchName){
+        File file = join(Branch,branchName);
+        if (file.exists()){
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
+        String BranchFromHead =readContentsAsString(Head);
+        String commitsId= readContentsAsString(join(Branch,BranchFromHead));
+        writeContents(file,commitsId);
 
    }
 
@@ -241,9 +273,19 @@ public class Repository {
         }
         return head;
     }
+
     private  void writeCommitToFile(Commit commit){
         File path = join(COMMITS_DIR,commit.getId());
         writeObject(path,commit);
+    }
+
+    private  void WriteFilesFromCommit(String BranchName){
+        String commitsId =readContentsAsString(join(Branch,BranchName));
+        File file =join(COMMITS_DIR,commitsId);
+        Commit commit =readObject(file,Commit.class);
+        Map<String,String> map=commit.getBlobs();
+        map.forEach((k,v)->writeContents(join(CWD,k),getBlobsFromFile(v).getContent()));
+
     }
 
     private Blobs getBlobsFromFile(String blobId){
@@ -252,13 +294,71 @@ public class Repository {
         return blobs;
     }
 
+    private  String getFullId(String id ){
+        if (id.length()==UID_LENGTH){
+            return id;
+        }
+        for (String filename:COMMITS_DIR.list()){
+            if (filename.startsWith(id)){
+                return filename;
+            }
+        }
+        return null;
+    }
+
+    private void validUntrackedFile(Map<String, String> blobs) {
+        List<String> untrackedFiles = getUntrackedFile();
+        if (untrackedFiles.isEmpty()) {
+            return;
+        }
+
+        for (String filename : untrackedFiles) {
+            String blobId = new Blobs(filename, CWD).getId();
+            String otherId = blobs.getOrDefault(filename, "");
+            if (!otherId.equals(blobId)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+    }
+
+    private List<String> getUntrackedFile(){
+        List<String> res = new ArrayList<>();
+        Stage stage =readObject(STAGE,Stage.class);
+        ArrayList<String>  stageFiles= stage.getAllStagedFile();
+        Set<String> HeadFiles= getCommitFormTheHead().getBlobs().keySet();
+        for (String filename : plainFilenamesIn(CWD)) {
+            // file that not track by stage and the current commit
+            if (!stageFiles.contains(filename) && !HeadFiles.contains(filename)) {
+                res.add(filename);
+            }
+        }
+        Collections.sort(res);
+        return res;
+
+    }
 
 
+     private void clearStage(){
+         Stage stage= readObject(STAGE,Stage.class);
+         stage.getAdded().clear();
+         stage.getRemoved().clear();
+     }
+     private void removeAllFilesInCWD(){
+         List<String> FileDir=plainFilenamesIn(CWD);
+         for (String file : FileDir){
+             restrictedDelete(file);
+         }
+     }
 
-    public void readfromStage(){
-   Stage stage =readObject(STAGE,Stage.class);
-       System.out.println(stage.getAdded());
-       System.out.println(stage.getRemoved());
+
+    private boolean checkDuplicateFile(Map<String,String> map,File filename){
+       return map.keySet().stream().anyMatch(a->join(CWD,a).equals(filename));
+    }
+    public  void  getStagedFile(){
+        Stage stage =readObject(STAGE,Stage.class);
+        System.out.println(stage.getAdded());
+        System.out.println(stage.getRemoved());
     }
     public void getTrackedFileFromCurrentcommit(){
         String branch =readContentsAsString(Head);
@@ -267,6 +367,9 @@ public class Repository {
         System.out.println(commit.getBlobs());
         System.out.println(commit.getMessage());
     }
+
+
+
 
 
 }

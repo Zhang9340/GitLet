@@ -2,11 +2,8 @@ package gitlet;
 
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Stage implements Serializable {
@@ -15,7 +12,7 @@ public class Stage implements Serializable {
     private Set<String> removed;
 
     public Stage(){
-       this.added= new HashMap<>();
+       this.added= new ConcurrentHashMap<>();
        this.removed=new HashSet<>();
     }
 
@@ -32,5 +29,12 @@ public class Stage implements Serializable {
 
     public Set<String> getRemoved() {
         return removed;
+    }
+
+    public ArrayList<String> getAllStagedFile(){
+        ArrayList<String> res = new ArrayList<>();
+        res.addAll(added.keySet());
+        res.addAll(removed);
+        return res;
     }
 }
