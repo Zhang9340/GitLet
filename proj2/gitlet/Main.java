@@ -61,7 +61,7 @@ public class Main {
                 if (len == 3) {
                     // java gitlet.Main checkout -- [file name]
                     if (!args[1].equals("--")){
-                        System.out.println("invalid operand");
+                        System.out.println("Incorrect operands.");
                         System.exit(0);
                     }
                     repository.checkout(args[2]);
@@ -69,7 +69,7 @@ public class Main {
                 }else if (len==4) {
                     //java gitlet.Main checkout [commit id] -- [file name]
                     if (!args[2].equals("--")) {
-                        System.out.println("invalid operand");
+                        System.out.println("Incorrect operands.");
                         System.exit(0);
                     }
                     repository.checkout(args[3], args[1]);
