@@ -31,6 +31,8 @@ public class Stage implements Serializable {
         return removed;
     }
 
+
+    // Files from the add stage and removal stage
     public ArrayList<String> getAllStagedFile(){
         ArrayList<String> res = new ArrayList<>();
         res.addAll(added.keySet());

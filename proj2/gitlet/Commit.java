@@ -49,6 +49,9 @@ public class Commit implements Serializable {
         this.blobs=parents.getBlobs();
 
         blobs.putAll(stage.getAdded());
+        //remove the file that staged in remove
+
+        blobs.keySet().removeAll(stage.getRemoved()) ;
 
         this.id=Utils.sha1(message,timeStamp.toString(),parents.toString(),blobs.toString());
 

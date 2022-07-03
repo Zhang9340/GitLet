@@ -65,7 +65,7 @@ public class Main {
                         System.exit(0);
                     }
                     repository.checkout(args[2]);
-                    break;
+
                 }else if (len==4) {
                     //java gitlet.Main checkout [commit id] -- [file name]
                     if (!args[2].equals("--")) {
@@ -73,12 +73,26 @@ public class Main {
                         System.exit(0);
                     }
                     repository.checkout(args[3], args[1]);
-                    break;
+
                 }
                 else if  (len==2){
                     repository.checkout_branch(args[1]);
+
                     }
-                }
+                break;
+
+            case"status":
+                   repository.status();
+                   break;
+            default :
+                System.out.println("No command with that name exists.");
+                break;
+
+        }
+
+
+
+
 
 
 

@@ -2,6 +2,7 @@ package gitlet;
 
 
 import java.io.File;
+import java.sql.Blob;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -107,7 +108,7 @@ public class Repository {
       String headCommitBlobId=headCommit.getBlobs().getOrDefault(FileName, "");
       // find dulplicate files
       if (Objects.equals(blobs.getId(), headCommitBlobId)
-              && checkDuplicateFile(stageAddedFile,file) ){
+              || checkDuplicateFile(stageAddedFile,file) ){
           System.exit(0);
       }else {
           //write stage and blobs object
@@ -136,6 +137,7 @@ public class Repository {
 
         // remove the file in the stage
         stage.getAdded().clear();
+        stage.getRemoved().clear();
 
         writeObject(STAGE,stage);
         //change the HEAD and Branch pointer
@@ -155,13 +157,13 @@ public class Repository {
             System.exit(0);
         }
         if (!stageid.equals("")){
+            //remove form the stage
             stage.getAdded().remove(filename);
-
-
-        }else {
-            stage .getRemoved().add(filename);
         }
-        if (!commitid.equals("")){
+
+        if (!commitid.equals("")&&stageid.equals("")){
+            // remove for removal stage and delete the file if it is still in the CWD
+            stage .getRemoved().add(filename);
             restrictedDelete(filename);
         }
         writeObject(STAGE,stage);
@@ -260,6 +262,91 @@ public class Repository {
 
    }
 
+   public void status() {
+       if (!GITLET_DIR.exists() || !GITLET_DIR.isDirectory()) {
+           System.out.println("Not in an initialized Gitlet directory.");
+           System.exit(0);
+       }
+
+       StringBuffer output = new StringBuffer();
+       output.append("=== Branches ===").append("\n");
+       List<String> branches = plainFilenamesIn(Branch);
+       List<String> Blobs = plainFilenamesIn(BLOBS_DIR);
+       String HeadBranch = readContentsAsString(Head);
+       List<String> FileInCWD = plainFilenamesIn(CWD);
+
+
+
+       for (String branch : branches) {
+           if (HeadBranch.equals(branch)) {
+               output.append("*").append(branch).append("\n");
+           } else {
+               output.append(branch).append("\n");
+           }
+           output.append("\n");
+       }
+       Stage stage = readObject(STAGE, Stage.class);
+       Commit commit = getCommitFormTheHead();
+       output.append("=== Staged Files ===").append("\n");
+
+       stage.getAdded().keySet().stream().sorted().forEach(s -> output.append(s).append("\n"));
+       output.append("\n");
+
+
+       output.append("=== Removed Files ===").append("\n");
+       stage.getRemoved().stream().sorted().forEach(s -> output.append(s).append("\n"));
+       output.append("\n");
+
+
+       output.append("=== Modifications Not Staged For Commit ===").append("\n");
+      if (FileInCWD!=null){
+       for (String filename : FileInCWD) {
+
+           if (commit.getBlobs().containsKey(filename)
+                   && commit.getBlobs().containsValue(new Blobs(filename, CWD).getId())
+                   && !stage.getAdded().containsKey(filename)) {
+               // Tracked in the current commit, changed in the working directory, but not staged;
+               output.append(filename).append("(modified)").append("\n");
+           } else if (stage.getAdded().containsKey(filename)
+                   && !stage.getAdded().containsValue(new Blobs(filename, CWD).getId())) {
+               // Staged for addition, but with different contents than in the working directory;
+               output.append(filename).append("(modified)").append("\n");
+           } else if (stage.getAdded().containsKey(filename)
+                   && !join(CWD, filename).exists()) {
+               //Staged for addition, but deleted in the working directory
+               output.append(filename).append("(deleted)").append("\n");
+
+           } else if (!stage.getRemoved().contains(filename)
+                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
+               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
+               output.append(filename).append("(deleted)").append("\n");
+           }
+
+               output.append("\n");
+       }
+      }
+
+
+       output.append("=== Untracked Files ===").append("\n");
+       if (FileInCWD!=null){
+           for (String filename : FileInCWD) {
+               if (!stage.getAdded().containsKey(filename)&&commit.getBlobs().containsKey(filename)){
+                   output.append(filename).append("\n");
+               }else if(stage.getRemoved().contains(filename)&&join(CWD,filename).exists()){
+                   output.append(filename).append("\n");
+               }
+           }
+       }
+
+
+       output.append("\n");
+       System.out.println(output);
+
+   }
+
+
+
+
     private Commit getCommitFormTheHead(){
         //From the Head file get the branch name
         String BranchName =readContentsAsString(Head);
@@ -267,7 +354,7 @@ public class Repository {
         String commitsId = readContentsAsString(join(Branch,BranchName));
         File file= join(COMMITS_DIR,commitsId);
         Commit head =readObject(file,Commit.class);
-        if (head==null){
+        if (head==null) {
             System.out.println("error! cannot find HEAD!");
             System.exit(0);
         }
@@ -290,8 +377,7 @@ public class Repository {
 
     private Blobs getBlobsFromFile(String blobId){
         File blobfile =join(BLOBS_DIR,blobId);
-        Blobs blobs= readObject(blobfile,Blobs.class);
-        return blobs;
+        return readObject(blobfile,Blobs.class);
     }
 
     private  String getFullId(String id ){
