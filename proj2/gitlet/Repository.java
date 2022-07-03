@@ -113,6 +113,9 @@ public class Repository {
       }else {
           //write stage and blobs object
           stage.add(FileName, blobs.getId());
+          if (stage.getRemoved().contains(FileName)){
+              stage.getRemoved().remove(FileName);
+          }
           writeObject(STAGE, stage);
       }
     }
@@ -162,7 +165,8 @@ public class Repository {
         }
 
         if (!commitid.equals("")&&stageid.equals("")){
-            // remove for removal stage and delete the file if it is still in the CWD
+            // If the file is tracked in the current commit,
+            // stage it for removal and remove the file from the working directory if the user has not already done so
             stage .getRemoved().add(filename);
             restrictedDelete(filename);
         }
@@ -322,10 +326,10 @@ public class Repository {
 //               output.append(filename).append("(deleted)").append("\n");
 //           }
 //
-//               output.append("\n");
+//
 //       }
 //      }
-
+          output.append("\n");
 
        output.append("=== Untracked Files ===").append("\n");
 //       if (FileInCWD!=null){
