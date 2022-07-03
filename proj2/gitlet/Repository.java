@@ -120,7 +120,7 @@ public class Repository {
     public void commit(String message){
        // read from the stage
         Stage stage= readObject(STAGE,Stage.class);
-        if (stage.getAdded().isEmpty()){
+        if (stage.getAdded().isEmpty()&&stage.getRemoved().isEmpty()){
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
