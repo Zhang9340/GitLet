@@ -299,44 +299,44 @@ public class Repository {
 
 
        output.append("=== Modifications Not Staged For Commit ===").append("\n");
-      if (FileInCWD!=null){
-       for (String filename : FileInCWD) {
-
-           if (commit.getBlobs().containsKey(filename)
-                   && commit.getBlobs().containsValue(new Blobs(filename, CWD).getId())
-                   && !stage.getAdded().containsKey(filename)) {
-               // Tracked in the current commit, changed in the working directory, but not staged;
-               output.append(filename).append("(modified)").append("\n");
-           } else if (stage.getAdded().containsKey(filename)
-                   && !stage.getAdded().containsValue(new Blobs(filename, CWD).getId())) {
-               // Staged for addition, but with different contents than in the working directory;
-               output.append(filename).append("(modified)").append("\n");
-           } else if (stage.getAdded().containsKey(filename)
-                   && !join(CWD, filename).exists()) {
-               //Staged for addition, but deleted in the working directory
-               output.append(filename).append("(deleted)").append("\n");
-
-           } else if (!stage.getRemoved().contains(filename)
-                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
-               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
-               output.append(filename).append("(deleted)").append("\n");
-           }
-
-               output.append("\n");
-       }
-      }
+//       if (FileInCWD!=null){
+//       for (String filename : FileInCWD) {
+//
+//           if (commit.getBlobs().containsKey(filename)
+//                   && commit.getBlobs().containsValue(new Blobs(filename, CWD).getId())
+//                   && !stage.getAdded().containsKey(filename)) {
+//               // Tracked in the current commit, changed in the working directory, but not staged;
+//               output.append(filename).append("(modified)").append("\n");
+//           } else if (stage.getAdded().containsKey(filename)
+//                   && !stage.getAdded().containsValue(new Blobs(filename, CWD).getId())) {
+//               // Staged for addition, but with different contents than in the working directory;
+//               output.append(filename).append("(modified)").append("\n");
+//           } else if (stage.getAdded().containsKey(filename)
+//                   && !join(CWD, filename).exists()) {
+//               //Staged for addition, but deleted in the working directory
+//               output.append(filename).append("(deleted)").append("\n");
+//
+//           } else if (!stage.getRemoved().contains(filename)
+//                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
+//               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
+//               output.append(filename).append("(deleted)").append("\n");
+//           }
+//
+//               output.append("\n");
+//       }
+//      }
 
 
        output.append("=== Untracked Files ===").append("\n");
-       if (FileInCWD!=null){
-           for (String filename : FileInCWD) {
-               if (!stage.getAdded().containsKey(filename)&&commit.getBlobs().containsKey(filename)){
-                   output.append(filename).append("\n");
-               }else if(stage.getRemoved().contains(filename)&&join(CWD,filename).exists()){
-                   output.append(filename).append("\n");
-               }
-           }
-       }
+//       if (FileInCWD!=null){
+//           for (String filename : FileInCWD) {
+//               if (!stage.getAdded().containsKey(filename)&&commit.getBlobs().containsKey(filename)){
+//                   output.append(filename).append("\n");
+//               }else if(stage.getRemoved().contains(filename)&&join(CWD,filename).exists()){
+//                   output.append(filename).append("\n");
+//               }
+//           }
+//       }
 
 
        output.append("\n");
