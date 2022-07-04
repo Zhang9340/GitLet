@@ -259,7 +259,9 @@ public class Repository {
 
    }
 
-   public void status() {
+    public void rm_branch(String branchName){}
+
+    public void status() {
        if (!GITLET_DIR.exists() || !GITLET_DIR.isDirectory()) {
            System.out.println("Not in an initialized Gitlet directory.");
            System.exit(0);
@@ -308,29 +310,19 @@ public class Repository {
                    && !stage.getAdded().containsValue(new Blobs(filename, CWD).getId())) {
                // Staged for addition, but with different contents than in the working directory;
                output.append(filename).append("(modified)").append("\n");
-//           } else if (stage.getAdded().containsKey(filename)
-//                   && !join(CWD, filename).exists()) {
-//               //Staged for addition, but deleted in the working directory
-//               output.append(filename).append("(deleted)").append("\n");
-//
-//           } else if (!stage.getRemoved().contains(filename)
-//                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
-//               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
-//               output.append(filename).append("(deleted)").append("\n");
            }
-
        }
-       
+
        Set<String>  trackedByCommit = commit.getBlobs().keySet();
-           for (String filename:trackedByCommit) {
-               if (stage.getAdded().containsKey(filename)
+      for (String filename:trackedByCommit) {
+          if (stage.getAdded().containsKey(filename)
                   && !join(CWD, filename).exists()){
                    //Staged for addition, but deleted in the working directory
-                output.append(filename).append("(deleted)").append("\n");
-               }else if (!stage.getRemoved().contains(filename)
+              output.append(filename).append("(deleted)").append("\n");
+          }else if (!stage.getRemoved().contains(filename)
                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
-//               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
-                  output.append(filename).append("(deleted)").append("\n");
+                //Not staged for removal, but tracked in the current commit and deleted from the working directory.
+              output.append(filename).append("(deleted)").append("\n");
            }
                
            }
@@ -356,7 +348,22 @@ public class Repository {
 
    }
 
+    public void reset(String commitId){
+        String commitIdFull=getFullId(commitId);
+        File commitFile= join(COMMITS_DIR,commitIdFull);
+        if (!commitFile.exists()){
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        clearStage();
+        removeAllFilesInCWD();
+        // move the Head pointer to the given commit ID
+        String branchesName= readContentsAsString(Head);
+        writeContents(join(Branch,branchesName),commitIdFull);
 
+        WriteFilesFromCommit(branchesName);
+
+    }
 
 
     private Commit getCommitFormTheHead(){
@@ -437,12 +444,13 @@ public class Repository {
     }
 
 
-     private void clearStage(){
+    private void clearStage(){
          Stage stage= readObject(STAGE,Stage.class);
          stage.getAdded().clear();
          stage.getRemoved().clear();
      }
-     private void removeAllFilesInCWD(){
+
+    private void removeAllFilesInCWD(){
          List<String> FileDir=plainFilenamesIn(CWD);
          for (String file : FileDir){
              restrictedDelete(file);

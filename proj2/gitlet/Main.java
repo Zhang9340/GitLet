@@ -11,7 +11,12 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        // TODO: what if args is empty?
+        //  if args is empty
+        if (args == null || args.length == 0) {
+            System.out.println("Please enter a command.");
+            System.exit(0);
+        }
+
         String firstArg = args[0];
         Repository repository = new Repository();
         switch(firstArg) {
@@ -84,6 +89,10 @@ public class Main {
             case"status":
                    repository.status();
                    break;
+
+            case"reset":
+                repository.reset(args[1]);
+                break;
             default :
                 System.out.println("No command with that name exists.");
                 break;
