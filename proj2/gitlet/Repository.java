@@ -225,19 +225,19 @@ public class Repository {
    }
 
     public void checkout_branch(String Branchname){
-        File Branchfile =join(Branch,Branchname);
+        File Branchfile = join(Branch,Branchname);
         if (!Branchfile.exists()){
             System.out.println("No such branch exists.");
             System.exit(0);
         }
-       String BranchFromHead =readContentsAsString(Head);
+       String BranchFromHead = readContentsAsString(Head);
         if (Branchname.equals(BranchFromHead)){
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
         //If a working file is untracked in the current branch and would be overwritten by the checkout,
        // print There is an untracked file in the way; delete it, or add and commit it first. and exit
-       Commit commit =getCommitFormTheHead();
+       Commit commit = getCommitFormTheHead();
        validUntrackedFile(commit.getBlobs());
        // remove the files in the current CWD and replace it with the file in the commit that this branch points to
 
@@ -267,8 +267,11 @@ public class Repository {
             System.exit(0);
         }
         if (currentBranch.equals(branchName)){
-
+             System.out.println("Cannot remove the current branch.");
+             System.exit(0);
         }
+
+        restrictedDelete(file);
 
     }
 
@@ -361,20 +364,20 @@ public class Repository {
    }
 
     public void reset(String commitId){
-        String commitIdFull=getFullId(commitId);
+        String commitIdFull = getFullId(commitId);
         File commitFile= join(COMMITS_DIR,commitIdFull);
         if (!commitFile.exists()){
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
         // check if there is any untracked file in cwd
-        Commit commit =getCommitFormTheHead();
+        Commit commit = getCommitFormTheHead();
         validUntrackedFile(commit.getBlobs());
 
         clearStage();
         removeAllFilesInCWD();
         // move the Head pointer to the given commit ID
-        String branchesName= readContentsAsString(Head);
+        String branchesName = readContentsAsString(Head);
         writeContents(join(Branch,branchesName),commitIdFull);
 
         WriteFilesFromCommit(branchesName);
@@ -384,12 +387,12 @@ public class Repository {
 
     private Commit getCommitFormTheHead(){
         //From the Head file get the branch name
-        String BranchName =readContentsAsString(Head);
+        String BranchName = readContentsAsString(Head);
         //From the Branches get the Commits
         String commitsId = readContentsAsString(join(Branch,BranchName));
         File file= join(COMMITS_DIR,commitsId);
-        Commit head =readObject(file,Commit.class);
-        if (head==null) {
+        Commit head = readObject(file,Commit.class);
+        if (head == null) {
             System.out.println("error! cannot find HEAD!");
             System.exit(0);
         }
@@ -402,21 +405,21 @@ public class Repository {
     }
 
     private  void WriteFilesFromCommit(String BranchName){
-        String commitsId =readContentsAsString(join(Branch,BranchName));
-        File file =join(COMMITS_DIR,commitsId);
-        Commit commit =readObject(file,Commit.class);
-        Map<String,String> map=commit.getBlobs();
+        String commitsId = readContentsAsString(join(Branch,BranchName));
+        File file = join(COMMITS_DIR,commitsId);
+        Commit commit = readObject(file,Commit.class);
+        Map<String,String> map = commit.getBlobs();
         map.forEach((k,v)->writeContents(join(CWD,k),getBlobsFromFile(v).getContent()));
 
     }
 
     private Blobs getBlobsFromFile(String blobId){
-        File blobfile =join(BLOBS_DIR,blobId);
+        File blobfile = join(BLOBS_DIR,blobId);
         return readObject(blobfile,Blobs.class);
     }
 
     private  String getFullId(String id ){
-        if (id.length()==UID_LENGTH){
+        if (id.length() == UID_LENGTH){
             return id;
         }
         for (String filename:COMMITS_DIR.list()){
@@ -438,27 +441,14 @@ public class Repository {
     }
 
     private boolean getUntrackedFile(){
-//        List<String> res = new ArrayList<>();
-//        Stage stage =readObject(STAGE,Stage.class);
-//        ArrayList<String>  stageFiles= stage.getAllStagedFile();
-//        Set<String> HeadFiles= getCommitFormTheHead().getBlobs().keySet();
-//        for (String filename : plainFilenamesIn(CWD)) {
-//            // file that not track by stage and the current commit
-//            if (!stageFiles.contains(filename) && !HeadFiles.contains(filename)) {
-//                res.add(filename);
-//            }
-//        }
-//        Collections.sort(res);
-//        return res;
-
         List<String> FileInCWD = plainFilenamesIn(CWD);
         Stage stage = readObject(STAGE, Stage.class);
         Commit commit = getCommitFormTheHead();
         if (FileInCWD!=null){
             for (String filename : FileInCWD) {
-                if (!stage.getAdded().containsKey(filename)&&!commit.getBlobs().containsKey(filename)){
+                if (!stage.getAdded().containsKey(filename) && !commit.getBlobs().containsKey(filename)){
                      return true;
-                }else if(stage.getRemoved().contains(filename)&&join(CWD,filename).exists()){
+                }else if(stage.getRemoved().contains(filename) && join(CWD,filename).exists()){
                    return true;
                 }
             }
@@ -477,20 +467,20 @@ public class Repository {
      }
 
     private void removeAllFilesInCWD(){
-         List<String> FileDir=plainFilenamesIn(CWD);
+         List<String> FileDir = plainFilenamesIn(CWD);
          for (String file : FileDir){
              restrictedDelete(file);
          }
      }
 
     public  void  getStagedFile(){
-        Stage stage =readObject(STAGE,Stage.class);
+        Stage stage = readObject(STAGE,Stage.class);
         System.out.println(stage.getAdded());
         System.out.println(stage.getRemoved());
     }
     public void getTrackedFileFromCurrentcommit(){
-        String branch =readContentsAsString(Head);
-        String CommitId= readContentsAsString(join(Branch,branch));
+        String branch = readContentsAsString(Head);
+        String CommitId = readContentsAsString(join(Branch,branch));
         Commit commit= readObject(join(COMMITS_DIR,CommitId),Commit.class);
         System.out.println(commit.getBlobs());
         System.out.println(commit.getMessage());
