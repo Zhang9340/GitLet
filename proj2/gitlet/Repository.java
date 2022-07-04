@@ -284,7 +284,8 @@ public class Repository {
        List<String> Blobs = plainFilenamesIn(BLOBS_DIR);
        String HeadBranch = readContentsAsString(Head);
        List<String> FileInCWD = plainFilenamesIn(CWD);
-
+        Stage stage = readObject(STAGE, Stage.class);
+        Commit commit = getCommitFormTheHead();
 
 
        for (String branch : branches) {
@@ -296,8 +297,7 @@ public class Repository {
 
        }
         output.append("\n");
-       Stage stage = readObject(STAGE, Stage.class);
-       Commit commit = getCommitFormTheHead();
+
        output.append("=== Staged Files ===").append("\n");
 
        stage.getAdded().keySet().stream().sorted().forEach(s -> output.append(s).append("\n"));
@@ -367,6 +367,10 @@ public class Repository {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
+        // check if there is any untracked file in cwd
+        Commit commit =getCommitFormTheHead();
+        validUntrackedFile(commit.getBlobs());
+
         clearStage();
         removeAllFilesInCWD();
         // move the Head pointer to the given commit ID
@@ -424,23 +428,16 @@ public class Repository {
     }
 
     private void validUntrackedFile(Map<String, String> blobs) {
-        List<String> untrackedFiles = getUntrackedFile();
-        if (untrackedFiles.isEmpty()) {
+
+        if (!getUntrackedFile()) {
             return;
         }
 
-        for (String filename : untrackedFiles) {
-            String blobId = new Blobs(filename, CWD).getId();
-            String otherId = blobs.getOrDefault(filename, "");
-            if (!otherId.equals(blobId)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                System.exit(0);
-            }
-        }
-
+        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+        System.exit(0);
     }
 
-    private List<String> getUntrackedFile(){
+    private boolean getUntrackedFile(){
 //        List<String> res = new ArrayList<>();
 //        Stage stage =readObject(STAGE,Stage.class);
 //        ArrayList<String>  stageFiles= stage.getAllStagedFile();
@@ -453,16 +450,21 @@ public class Repository {
 //        }
 //        Collections.sort(res);
 //        return res;
-        List<String> untracked = new ArrayList<>();
-        Stage stage =readObject(STAGE,Stage.class);
-        List<String> stagedFiles = new ArrayList<String>(stage.getAdded().values());
-        for (String file: plainFilenamesIn(CWD)){
-            if (stagedFiles.contains(new Blobs(file,CWD).getId())){
-                untracked.add(file);
+
+        List<String> FileInCWD = plainFilenamesIn(CWD);
+        Stage stage = readObject(STAGE, Stage.class);
+        Commit commit = getCommitFormTheHead();
+        if (FileInCWD!=null){
+            for (String filename : FileInCWD) {
+                if (!stage.getAdded().containsKey(filename)&&!commit.getBlobs().containsKey(filename)){
+                     return true;
+                }else if(stage.getRemoved().contains(filename)&&join(CWD,filename).exists()){
+                   return true;
+                }
             }
         }
 
-        return untracked;
+        return false;
 
     }
 
