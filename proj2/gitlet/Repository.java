@@ -448,6 +448,7 @@ public class Repository {
          Stage stage= readObject(STAGE,Stage.class);
          stage.getAdded().clear();
          stage.getRemoved().clear();
+         writeObject(STAGE,stage);
      }
 
     private void removeAllFilesInCWD(){

@@ -52,6 +52,9 @@ public class Main {
                repository.Branch(args[1]);
                break;
 
+            case "rm-branch":
+                repository.rm_branch(args[1]);
+
             case"check":
                 repository.getStagedFile();
                 break;
@@ -93,6 +96,9 @@ public class Main {
             case"reset":
                 repository.reset(args[1]);
                 break;
+
+
+
             default :
                 System.out.println("No command with that name exists.");
                 break;
