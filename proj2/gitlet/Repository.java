@@ -181,12 +181,35 @@ public class Repository {
         StringBuffer sb = new StringBuffer();
         List<String> filename =plainFilenamesIn(COMMITS_DIR);
         for (String file: filename){
-            File commitfile= join(COMMITS_DIR,file);
-            Commit commit =readObject(commitfile,Commit.class);
+            File commitFile= join(COMMITS_DIR,file);
+            Commit commit =readObject(commitFile,Commit.class);
             sb.append(commit.toString());
         }
         System.out.println(sb);
     }
+
+
+    public void  find(String commitMsg){
+        StringBuffer sb =new StringBuffer();
+        List<String> fileFound =new ArrayList<>();
+        List<String> commitIds =plainFilenamesIn(COMMITS_DIR);
+        for (String file : commitIds) {
+            File commitFile= join(COMMITS_DIR,file);
+            Commit commit =readObject(commitFile,Commit.class);
+            if (commit.getMessage().equals(commitMsg)){
+               sb.append(commit.getId()).append("\n");
+            }
+
+        }
+        if (sb.length()==0){
+            System.out.println("Found no commit with that message.");
+            System.exit(0);
+        }
+
+        System.out.println(sb);
+
+    }
+
     // java gitlet.Main checkout -- [file name]
     public void checkout(String filename){
         //Takes the version of the file as it exists in the head commit and puts it in the working directory,

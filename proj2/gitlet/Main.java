@@ -49,6 +49,7 @@ public class Main {
                 break;
 
             case"find":
+                repository.find(args[1]);
                 break;
 
             case "branch":

@@ -68,7 +68,7 @@ public class Commit implements Serializable {
         DateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
         return df.format(timeStamp);
     }
-    public String getId() {return id;}
+    public String getId() { return id; }
     public HashMap<String, String> getBlobs() {return blobs;}
 
     public String getParentsId() {
