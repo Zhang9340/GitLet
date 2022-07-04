@@ -259,7 +259,14 @@ public class Repository {
 
    }
 
-    public void rm_branch(String branchName){}
+    public void rm_branch(String branchName){
+        File file = join(Branch,branchName);
+        if (!file.exists()){
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+
+    }
 
     public void status() {
        if (!GITLET_DIR.exists() || !GITLET_DIR.isDirectory()) {
@@ -282,8 +289,9 @@ public class Repository {
            } else {
                output.append(branch).append("\n");
            }
-           output.append("\n");
+
        }
+        output.append("\n");
        Stage stage = readObject(STAGE, Stage.class);
        Commit commit = getCommitFormTheHead();
        output.append("=== Staged Files ===").append("\n");
