@@ -4,6 +4,7 @@ package gitlet;
 import java.io.File;
 import java.sql.Blob;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -307,19 +308,34 @@ public class Repository {
                    && !stage.getAdded().containsValue(new Blobs(filename, CWD).getId())) {
                // Staged for addition, but with different contents than in the working directory;
                output.append(filename).append("(modified)").append("\n");
-           } else if (stage.getAdded().containsKey(filename)
-                   && !join(CWD, filename).exists()) {
-               //Staged for addition, but deleted in the working directory
-               output.append(filename).append("(deleted)").append("\n");
-
-           } else if (!stage.getRemoved().contains(filename)
-                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
-               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
-               output.append(filename).append("(deleted)").append("\n");
+//           } else if (stage.getAdded().containsKey(filename)
+//                   && !join(CWD, filename).exists()) {
+//               //Staged for addition, but deleted in the working directory
+//               output.append(filename).append("(deleted)").append("\n");
+//
+//           } else if (!stage.getRemoved().contains(filename)
+//                   && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
+//               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
+//               output.append(filename).append("(deleted)").append("\n");
            }
 
-
        }
+       
+       Set<String>  trackedByCommit = commit.getBlobs().keySet();
+           for (String filename:trackedByCommit) {
+               if (stage.getAdded().containsKey(filename)
+                  && !join(CWD, filename).exists()){
+                   //Staged for addition, but deleted in the working directory
+                output.append(filename).append("(deleted)").append("\n");
+               }else if (!stage.getRemoved().contains(filename)
+                  && commit.getBlobs().containsKey(filename) && !join(CWD, filename).exists()) {
+//               //Not staged for removal, but tracked in the current commit and deleted from the working directory.
+                  output.append(filename).append("(deleted)").append("\n");
+           }
+               
+           }
+      
+
       }
           output.append("\n");
 
