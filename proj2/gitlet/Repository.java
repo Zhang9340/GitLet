@@ -326,7 +326,7 @@ public class Repository {
        output.append("=== Untracked Files ===").append("\n");
        if (FileInCWD!=null){
            for (String filename : FileInCWD) {
-               if (!stage.getAdded().containsKey(filename)&&commit.getBlobs().containsKey(filename)){
+               if (!stage.getAdded().containsKey(filename)&&!commit.getBlobs().containsKey(filename)){
                    output.append(filename).append("\n");
                }else if(stage.getRemoved().contains(filename)&&join(CWD,filename).exists()){
                    output.append(filename).append("\n");
