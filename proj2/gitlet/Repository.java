@@ -261,9 +261,13 @@ public class Repository {
 
     public void rm_branch(String branchName){
         File file = join(Branch,branchName);
+        String currentBranch= readContentsAsString(Head);
         if (!file.exists()){
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
+        }
+        if (currentBranch.equals(branchName)){
+
         }
 
     }
@@ -433,21 +437,32 @@ public class Repository {
                 System.exit(0);
             }
         }
+
     }
 
     private List<String> getUntrackedFile(){
-        List<String> res = new ArrayList<>();
+//        List<String> res = new ArrayList<>();
+//        Stage stage =readObject(STAGE,Stage.class);
+//        ArrayList<String>  stageFiles= stage.getAllStagedFile();
+//        Set<String> HeadFiles= getCommitFormTheHead().getBlobs().keySet();
+//        for (String filename : plainFilenamesIn(CWD)) {
+//            // file that not track by stage and the current commit
+//            if (!stageFiles.contains(filename) && !HeadFiles.contains(filename)) {
+//                res.add(filename);
+//            }
+//        }
+//        Collections.sort(res);
+//        return res;
+        List<String> untracked = new ArrayList<>();
         Stage stage =readObject(STAGE,Stage.class);
-        ArrayList<String>  stageFiles= stage.getAllStagedFile();
-        Set<String> HeadFiles= getCommitFormTheHead().getBlobs().keySet();
-        for (String filename : plainFilenamesIn(CWD)) {
-            // file that not track by stage and the current commit
-            if (!stageFiles.contains(filename) && !HeadFiles.contains(filename)) {
-                res.add(filename);
+        List<String> stagedFiles = new ArrayList<String>(stage.getAdded().values());
+        for (String file: plainFilenamesIn(CWD)){
+            if (stagedFiles.contains(new Blobs(file,CWD).getId())){
+                untracked.add(file);
             }
         }
-        Collections.sort(res);
-        return res;
+
+        return untracked;
 
     }
 
