@@ -9,8 +9,7 @@ import static gitlet.Utils.*;
 
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+ *  In this repository, it contains all the implementation of the
  *
  *  @author ZHiYuan
  */
@@ -32,10 +31,7 @@ public class Repository {
     public File Head= join(GITLET_DIR, "heads");
     /**The file save the Stage object*/
     public File STAGE= join(STAGE_DIR,"stage");
-    /** The file that saves the commits object */
-    public File commits;
-    /**The file that saves  blobs object  */
-    public File blobs;
+
 
     /**
      * Creates a new Gitlet version-control system in the current directory.
@@ -433,7 +429,6 @@ public class Repository {
            }
        }
 
-
        output.append("\n");
        System.out.println(output);
 
@@ -466,7 +461,26 @@ public class Repository {
 
     }
 
-    public void merge(){}
+    public void merge(String branchName){
+        Stage stage =readObject(STAGE,Stage.class);
+        if (!stage.getAdded().isEmpty()){
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        File BranchFile = join(Branch,branchName);
+        if (!BranchFile.exists()){
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+
+        if (branchName.equals(readContentsAsString(Head))){
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+        validUntrackedFile();
+
+
+    }
 
 
     /**
@@ -496,6 +510,10 @@ public class Repository {
         writeObject(path,commit);
     }
 
+    /**
+     * Write all the file in the working directory that tracked by the  commit that pointed by the given branch
+     * @param BranchName  The branch name
+     */
     private  void WriteFilesFromCommit(String BranchName){
         String commitsId = readContentsAsString(join(Branch,BranchName));
         File file = join(COMMITS_DIR,commitsId);
@@ -587,7 +605,7 @@ public class Repository {
              restrictedDelete(file);
          }
      }
-     
+
 
 
 }

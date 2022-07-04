@@ -4,7 +4,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+
 
 import static gitlet.Utils.*;
 
