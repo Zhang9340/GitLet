@@ -107,17 +107,28 @@ public class Repository {
       // from the commit that the head pointer points to get the blobId for the given filename
       String headCommitBlobId=headCommit.getBlobs().getOrDefault(FileName, "");
       // find dulplicate files
-      if (Objects.equals(blobs.getId(), headCommitBlobId)
-              || checkDuplicateFile(stageAddedFile,file) ){
-          System.exit(0);
-      }else {
-          //write stage and blobs object
-          stage.add(FileName, blobs.getId());
-          if (stage.getRemoved().contains(FileName)){
-              stage.getRemoved().remove(FileName);
-          }
-          writeObject(STAGE, stage);
-      }
+//      if (Objects.equals(blobs.getId(), headCommitBlobId)
+//              || checkDuplicateFile(stageAddedFile,file) ){
+//          System.exit(0);
+//      }else if (stage.getRemoved().contains(FileName)){
+//          // Status with a removal followed by an add that restores former contents.
+//          // Should simply "unremove" the file without staging.
+//               stage.getRemoved().remove(FileName);
+//
+//      }else{
+//          //write stage and blobs object
+//          stage.add(FileName, blobs.getId());
+//      }
+//        writeObject(STAGE, stage);
+
+
+        if (headCommit.getBlobs().containsValue(blobs.getId())){
+            stage.getRemoved().remove(FileName);
+        }else {
+            stage.add(FileName,blobs.getId());
+        }
+
+        writeObject(STAGE, stage);
     }
 
     public void commit(String message){
@@ -444,6 +455,7 @@ public class Repository {
 
     private boolean checkDuplicateFile(Map<String,String> map,File filename){
        return map.keySet().stream().anyMatch(a->join(CWD,a).equals(filename));
+
     }
     public  void  getStagedFile(){
         Stage stage =readObject(STAGE,Stage.class);
