@@ -12,8 +12,8 @@ public class Stage implements Serializable {
     private Set<String> removed;
 
     public Stage(){
-       this.added= new ConcurrentHashMap<>();
-       this.removed=new HashSet<>();
+       this.added = new ConcurrentHashMap<>();
+       this.removed = new HashSet<>();
     }
 
 

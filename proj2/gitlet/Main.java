@@ -48,12 +48,16 @@ public class Main {
                 repository.global_log();
                 break;
 
+            case"find":
+                break;
+
             case "branch":
                repository.Branch(args[1]);
                break;
 
             case "rm-branch":
                 repository.rm_branch(args[1]);
+                break;
 
             case"check":
                 repository.getStagedFile();

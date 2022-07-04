@@ -34,19 +34,19 @@ public class Commit implements Serializable {
 
     /* TODO: fill in the rest of this class. */
     public Commit(){
-        this.message= "initial commit";
-        this.timeStamp= new Date(0);
-        this.blobs=new HashMap<>();
-        this.id=Utils.sha1(message,timeStamp.toString());
+        this.message = "initial commit";
+        this.timeStamp = new Date(0);
+        this.blobs = new HashMap<>();
+        this.id = Utils.sha1(message,timeStamp.toString());
     }
 
     public Commit(String message, Commit parents,Stage stage){
-        this.message=message;
-        this.parents=parents.getId();
-        this.timeStamp= new Date();
+        this.message = message;
+        this.parents = parents.getId();
+        this.timeStamp = new Date();
 
 
-        this.blobs=parents.getBlobs();
+        this.blobs = parents.getBlobs();
 
         blobs.putAll(stage.getAdded());
         //remove the file that staged in remove

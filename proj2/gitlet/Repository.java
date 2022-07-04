@@ -271,7 +271,7 @@ public class Repository {
              System.exit(0);
         }
 
-        restrictedDelete(file);
+       file.delete();
 
     }
 

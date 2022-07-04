@@ -16,14 +16,14 @@ public class Blobs implements Serializable {
     //filename blobsId
 
     public Blobs(String fileName, File CWD){
-        this.fileName=fileName;
+        this.fileName = fileName;
         File file = join(CWD,fileName);
         if (file.exists()){
-            content=readContents(file);
+            content = readContents(file);
             id=sha1(fileName,content);
         }else{
-            content=null;
-            id= sha1(fileName, null);
+            content = null;
+            id = sha1(fileName, null);
         }
 
     }
