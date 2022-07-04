@@ -60,10 +60,6 @@ public class Main {
                 repository.rm_branch(args[1]);
                 break;
 
-            case"check":
-                repository.getStagedFile();
-                break;
-
             case"checkout":
                 int len = args.length;  // 2 3 4
                 if (len < 2 || len > 4) {
