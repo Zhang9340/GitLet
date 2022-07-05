@@ -38,8 +38,7 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.timeStamp = new Date(0);
         this.blobs = new HashMap<>();
-        this.parents=null;
-        this.id = Utils.sha1(message,timeStamp.toString(), parents.toString(),blobs.toString());
+        this.id = Utils.sha1(message,timeStamp.toString());
     }
 
     public Commit(String message, List<Commit> parents, Stage stage){
