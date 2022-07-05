@@ -38,11 +38,13 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.timeStamp = new Date(0);
         this.blobs = new HashMap<>();
-        this.id = Utils.sha1(message,timeStamp.toString());
+        this.parents=new ArrayList<>();
+        this.id = Utils.sha1(message,timeStamp.toString(), parents.toString(),blobs.toString());
     }
 
     public Commit(String message, List<Commit> parents, Stage stage){
         this.message = message;
+        this.parents=new ArrayList<>();
         for (Commit parent: parents) {
             this.parents.add(parent.getId());
         }
@@ -78,6 +80,9 @@ public class Commit implements Serializable {
     public HashMap<String, String> getBlobs() {return blobs;}
 
     public String getParentsId() {
+     if (parents.isEmpty()){
+         return "null";
+     }
         return parents.get(0);
     }
 

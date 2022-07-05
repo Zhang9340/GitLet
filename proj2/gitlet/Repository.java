@@ -179,10 +179,12 @@ public class Repository {
         Commit commit=getCommitFormTheHead();
         while (commit!=null){
             System.out.println(commit);
-            if (commit.getParentsId()==null){
+            if (commit.getParentsId().equals("null")){
                 break;
             }
+
             commit= readObject(join(COMMITS_DIR,commit.getParentsId()),Commit.class);
+
         }
     }
 
@@ -627,16 +629,7 @@ public class Repository {
         return readObject(join(COMMITS_DIR,commitId),Commit.class);
     }
 
-//    private  List<String> DFS(Commit head){
-//        Queue<Commit> fringe = new LinkedList<>();
-//        Set<String> ancestors =new HashSet<>();
-//        fringe.add(head);
-//        while (!fringe.isEmpty()){
-//          Commit commit =  fringe.poll();
-//          if ()
 //
-//        }
-//    }
 
 
 }
