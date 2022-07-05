@@ -92,9 +92,17 @@ public class Commit implements Serializable {
 
     @Override
     public String toString(){
-        return "==="+"\n"
-                +"commit "+id +"\n"
-                +"Date: " +getTimeStamp()+"\n"
-                +getMessage()+"\n";
+        if (parents.size()==2) {
+            return "===" + "\n"
+                    + "commit " + id + "\n"
+                    +"Merge: "+ parents.get(0).substring(0, 7) + " " + parents.get(1).substring(0, 7) + "\n"
+                    + "Date: " + getTimeStamp() + "\n"
+                    + getMessage() + "\n";
+        }else {
+            return "===" + "\n"
+                    + "commit " + id + "\n"
+                    + "Date: " + getTimeStamp() + "\n"
+                    + getMessage() + "\n";
+        }
     }
 }

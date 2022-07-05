@@ -760,9 +760,10 @@ public class Repository {
     private Commit getTheSpitPoint(String branchName){
         Set<String> ancestorsFormCurrentBranch= BFS(getCommitFormTheHead());
         Queue<Commit> fringe = new LinkedList<>();
-        Commit spitPoint =getCommitFormBranch(branchName);
+        Commit startCommit =getCommitFormBranch(branchName);
         fringe.add(getCommitFormBranch(branchName));
         while (!fringe.isEmpty()){
+            Commit spitPoint =fringe.poll();
             if (ancestorsFormCurrentBranch.contains(spitPoint.getId())){
                 return spitPoint;
             }
