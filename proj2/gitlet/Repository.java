@@ -1,6 +1,7 @@
 package gitlet;
 
 
+
 import java.io.File;
 import java.util.*;
 import static gitlet.Utils.*;
@@ -477,12 +478,115 @@ public class Repository {
         if (branchName.equals(readContentsAsString(Head))){
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
+
         }
         validUntrackedFile();
 
         Commit headCommitFromHead = getCommitFormTheHead();
         Commit headCommitFromBranch =getCommitFormBranch(branchName);
         //Find split point of the current branch and the given branch
+        Commit splitPoint=getTheSpitPoint(branchName);
+        //If the split point is the same commit as the given branch, then we do nothing; the merge is complete.
+        if (splitPoint.getId().equals(headCommitFromBranch.getId())){
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        //If the split point is the current branch, then the effect is to check out the given branch
+        if (splitPoint.getId().equals(headCommitFromHead.getId())){
+            checkout_branch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+        //Get all files
+        Set<String> allFiles= new HashSet<>();
+        allFiles.addAll(headCommitFromBranch.getBlobs().keySet());
+        allFiles.addAll(headCommitFromHead.getBlobs().keySet());
+        allFiles.addAll(splitPoint.getBlobs().keySet());
+
+        List<String> rewriteFile= new ArrayList<>();
+        List<String> removeFile= new ArrayList<>();
+        List<String> conflictFile= new ArrayList<>();
+
+        for (String file:allFiles ) {
+            String id_head= headCommitFromHead.getBlobs().getOrDefault(file,"");
+            String id_other = headCommitFromBranch.getBlobs().getOrDefault(file,"");
+            String id_sp = splitPoint.getBlobs().getOrDefault(file,"");
+
+            if (id_head.equals(id_other) || id_sp.equals(id_other)){
+                continue;
+            }
+
+            if (id_head.equals(id_sp)){
+                if (!id_other.equals("")){
+                    rewriteFile.add(file);
+                }else {
+                    removeFile.add(file);
+                }
+
+            }else {
+                //conflict
+                conflictFile.add(file);
+            }
+        }
+
+
+        if (!removeFile.isEmpty()){
+            removeFile.forEach(this::rm);
+        }
+        if (!rewriteFile.isEmpty()){
+            for (String file:rewriteFile
+                 ) {
+                String id_other = headCommitFromBranch.getBlobs().getOrDefault(file,"");
+                Blobs blob = getBlobsFromFile(id_other);
+                File blobFile = join(CWD, blob.getId());
+                writeContents(blobFile,blob.getContent());
+                add(file);
+
+
+            }
+        }
+
+        if (!conflictFile.isEmpty()){
+            for (String file :conflictFile ) {
+                String id_head= headCommitFromHead.getBlobs().getOrDefault(file,"");
+                String id_other = headCommitFromBranch.getBlobs().getOrDefault(file,"");
+                String headContent= readContentFromBlob(id_head);
+                String otherContent =readContentFromBlob(id_head);
+
+               StringBuffer sb=new StringBuffer();
+               sb.append("<<<<<<< HEAD\n");
+               sb.append(headContent.equals("")? headContent: headContent+"\n");
+               sb.append("=======\n");
+               sb.append(otherContent.equals("") ? otherContent : otherContent + "\n");
+               sb.append(">>>>>>>\n");
+
+               File filename =join(CWD,file);
+               writeContents(filename,sb.toString());
+               System.out.println("Encountered a merge conflict.");
+            }
+
+            //Commit the new merge
+            String message = "Merged " + branchName + " into " + readContentsAsString(Head) + ".";
+            List<Commit> parents = List.of(headCommitFromHead, headCommitFromBranch);
+            Stage stage2 =readObject(STAGE,Stage.class);
+            Commit commit = new Commit(message,parents,stage2);
+            writeCommitToFile(commit);
+            // save the snapshot of the staged file
+            Map<String, String> blobs = stage2.getAdded();
+            blobs.forEach((key, value) -> writeObject(join(BLOBS_DIR, value), new Blobs(key, CWD)));
+
+            // remove the file in the stage
+            stage2.getAdded().clear();
+            stage2.getRemoved().clear();
+
+            writeObject(STAGE,stage2);
+            //change the HEAD and Branch pointer
+            String branchesName= readContentsAsString(Head);
+            writeContents(join(Branch,branchesName),commit.getId());
+
+        }
+
+
 
 
 
@@ -629,7 +733,46 @@ public class Repository {
         return readObject(join(COMMITS_DIR,commitId),Commit.class);
     }
 
-//
+    private String  readContentFromBlob(String blobId){
+        if (blobId.equals("")){
+            return "";
+        }
+        File file =join(BLOBS_DIR,blobId);
+        return readContentsAsString(file);
+
+    }
+
+    private  Set<String> BFS(Commit head){
+        Queue<Commit> fringe = new LinkedList<>();
+        Set<String> ancestors =new HashSet<>();
+        fringe.add(head);
+        while (!fringe.isEmpty()){
+          Commit commit =  fringe.poll();
+          if (!commit.getParents().isEmpty()&&!ancestors.contains(commit.getId())){
+              commit.getParents().forEach(a->fringe.add(readObject(join(COMMITS_DIR,a),Commit.class)));
+
+          }
+          ancestors.add(commit.getId());
+        }
+        return ancestors;
+    }
+
+    private Commit getTheSpitPoint(String branchName){
+        Set<String> ancestorsFormCurrentBranch= BFS(getCommitFormTheHead());
+        Queue<Commit> fringe = new LinkedList<>();
+        Commit spitPoint =getCommitFormBranch(branchName);
+        fringe.add(getCommitFormBranch(branchName));
+        while (!fringe.isEmpty()){
+            if (ancestorsFormCurrentBranch.contains(spitPoint.getId())){
+                return spitPoint;
+            }
+            if (!spitPoint.getParents().isEmpty()){
+                spitPoint.getParents().forEach(a->fringe.add(readObject(join(COMMITS_DIR,a),Commit.class)));
+            }
+        }
+
+        return new Commit();
+    }
 
 
 }

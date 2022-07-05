@@ -86,6 +86,9 @@ public class Commit implements Serializable {
         return parents.get(0);
     }
 
+    public List<String> getParents() {
+        return parents;
+    }
 
     @Override
     public String toString(){
