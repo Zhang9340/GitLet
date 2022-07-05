@@ -26,6 +26,7 @@ public class Commit implements Serializable {
     private String message;
     private Date  timeStamp;
     private String parents;
+    private List<String> parentsList;
     private String  id;
     /* The files that this commit track
     * filename
@@ -37,12 +38,15 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.timeStamp = new Date(0);
         this.blobs = new HashMap<>();
+        this.parentsList=new ArrayList<>(1);
         this.id = Utils.sha1(message,timeStamp.toString());
     }
 
     public Commit(String message, Commit parents,Stage stage){
         this.message = message;
         this.parents = parents.getId();
+        this.parentsList=parents.getParentsList();
+        this.parentsList.add(0,parents.getId());
         this.timeStamp = new Date();
 
 
@@ -73,6 +77,10 @@ public class Commit implements Serializable {
 
     public String getParentsId() {
         return parents;
+    }
+
+    public List<String> getParentsList(){
+           return parentsList;
     }
     @Override
     public String toString(){

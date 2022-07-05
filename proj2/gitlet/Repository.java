@@ -11,7 +11,7 @@ import static gitlet.Utils.*;
 /** Represents a gitlet repository.
  *  In this repository, it contains all the implementation of the
  *
- *  @author ZHiYuan
+ *  @author ZhiYuan
  */
 public class Repository {
 
@@ -145,22 +145,22 @@ public class Repository {
      * @param filename the file that intends to remove
      */
     public void rm(String filename){
-        File file= join(CWD,filename);
-        Stage stage =readObject(STAGE,Stage.class);
-        String stageid= stage.getAdded().getOrDefault(filename,"");
-        Commit commit =getCommitFormTheHead();
-        String commitid= commit.getBlobs().getOrDefault(filename,"");
 
-        if (stageid.equals("")&&commitid.equals("")){
+        Stage stage =readObject(STAGE,Stage.class);
+        String stagedId= stage.getAdded().getOrDefault(filename,"");
+        Commit commit =getCommitFormTheHead();
+        String commitId= commit.getBlobs().getOrDefault(filename,"");
+
+        if (stagedId.equals("")&&commitId.equals("")){
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
-        if (!stageid.equals("")){
+        if (!stagedId.equals("")){
             //remove form the stage
             stage.getAdded().remove(filename);
         }
 
-        if (!commitid.equals("")&&stageid.equals("")){
+        if (!commitId.equals("")&&stagedId.equals("")){
             // If the file is tracked in the current commit,
             // stage it for removal and remove the file from the working directory if the user has not already done so
             stage .getRemoved().add(filename);
@@ -472,14 +472,21 @@ public class Repository {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
-
         if (branchName.equals(readContentsAsString(Head))){
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
         validUntrackedFile();
 
+        //Find split point of the current branch and the given branch
 
+
+    }
+
+
+    public void check(){
+        Commit commit= getCommitFormTheHead();
+        System.out.println(commit.getParentsList());
     }
 
 
