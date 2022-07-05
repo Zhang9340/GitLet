@@ -25,8 +25,8 @@ public class Commit implements Serializable {
     /** The message of this Commit. */
     private String message;
     private Date  timeStamp;
-    private String parents;
-    private List<String> parentsList;
+    private List<String> parents;
+
     private String  id;
     /* The files that this commit track
     * filename
@@ -38,26 +38,29 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.timeStamp = new Date(0);
         this.blobs = new HashMap<>();
-        this.parentsList=new ArrayList<>(1);
-        this.id = Utils.sha1(message,timeStamp.toString());
+        this.parents=null;
+        this.id = Utils.sha1(message,timeStamp.toString(), parents.toString(),blobs.toString());
     }
 
-    public Commit(String message, Commit parents,Stage stage){
+    public Commit(String message, List<Commit> parents, Stage stage){
         this.message = message;
-        this.parents = parents.getId();
-        this.parentsList=parents.getParentsList();
-        this.parentsList.add(0,parents.getId());
+        for (Commit parent: parents) {
+            this.parents.add(parent.getId());
+        }
+
+
+
         this.timeStamp = new Date();
 
-
-        this.blobs = parents.getBlobs();
+        //first parent's blob
+        this.blobs = parents.get(0).getBlobs();
 
         blobs.putAll(stage.getAdded());
         //remove the file that staged in remove
 
         blobs.keySet().removeAll(stage.getRemoved()) ;
 
-        this.id=Utils.sha1(message,timeStamp.toString(),parents.toString(),blobs.toString());
+        this.id=Utils.sha1(message,timeStamp.toString(), parents.toString(),blobs.toString());
 
     }
 
@@ -76,12 +79,10 @@ public class Commit implements Serializable {
     public HashMap<String, String> getBlobs() {return blobs;}
 
     public String getParentsId() {
-        return parents;
+        return parents.get(0);
     }
 
-    public List<String> getParentsList(){
-           return parentsList;
-    }
+
     @Override
     public String toString(){
         return "==="+"\n"

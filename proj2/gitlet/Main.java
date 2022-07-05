@@ -104,9 +104,7 @@ public class Main {
                 break;
 
 
-            case"check":
-                repository.check();
-                break;
+
 
             default :
                 System.out.println("No command with that name exists.");

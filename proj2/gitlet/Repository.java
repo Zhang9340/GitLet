@@ -122,7 +122,7 @@ public class Repository {
             System.exit(0);
         }
         Commit parent=getCommitFormTheHead();
-        Commit commit =new Commit(message,parent, stage);
+        Commit commit =new Commit(message,List.of(parent), stage);
         writeCommitToFile(commit);
         // save the snapshot of the staged file
         Map<String, String> blobs = stage.getAdded();
@@ -478,16 +478,19 @@ public class Repository {
         }
         validUntrackedFile();
 
+        Commit headCommitFromHead = getCommitFormTheHead();
+        Commit headCommitFromBranch =getCommitFormBranch(branchName);
         //Find split point of the current branch and the given branch
 
 
+
     }
 
 
-    public void check(){
-        Commit commit= getCommitFormTheHead();
-        System.out.println(commit.getParentsList());
-    }
+
+
+
+
 
 
     /**
@@ -613,6 +616,26 @@ public class Repository {
          }
      }
 
+    /**
+     * Get the commit that certain branch points to
+     * @param branchName Branch's name
+     * @return The commit that the branch points to
+     */
+    private  Commit getCommitFormBranch(String branchName){
+
+        String commitId =readContentsAsString(join(Branch,branchName));
+        return readObject(join(COMMITS_DIR,commitId),Commit.class);
+    }
+
+//    private  List<String> DFS(Commit head){
+//        Queue<Commit> fringe = new LinkedList<>();
+//        Set<String> ancestors =new HashSet<>();
+//        fringe.add(head);
+//        while (!fringe.isEmpty()){
+//          Commit commit =  fringe.poll();
+//
+//        }
+//    }
 
 
 }
