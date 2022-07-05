@@ -627,16 +627,16 @@ public class Repository {
         return readObject(join(COMMITS_DIR,commitId),Commit.class);
     }
 
-    private  List<String> DFS(Commit head){
-        Queue<Commit> fringe = new LinkedList<>();
-        Set<String> ancestors =new HashSet<>();
-        fringe.add(head);
-        while (!fringe.isEmpty()){
-          Commit commit =  fringe.poll();
-          if ()
-
-        }
-    }
+//    private  List<String> DFS(Commit head){
+//        Queue<Commit> fringe = new LinkedList<>();
+//        Set<String> ancestors =new HashSet<>();
+//        fringe.add(head);
+//        while (!fringe.isEmpty()){
+//          Commit commit =  fringe.poll();
+//          if ()
+//
+//        }
+//    }
 
 
 }
