@@ -538,9 +538,9 @@ public class Repository {
                  ) {
                 String id_other = headCommitFromBranch.getBlobs().getOrDefault(file,"");
                 Blobs blob = getBlobsFromFile(id_other);
-                File blobFile = join(CWD, blob.getId());
-                writeContents(blobFile,blob.getContent());
-                add(file);
+                File writefile =join(CWD,blob.getFileName());
+                writeContents(writefile,blob.getContent());
+                add(blob.getFileName());
 
 
             }
