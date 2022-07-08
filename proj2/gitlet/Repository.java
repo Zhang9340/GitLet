@@ -518,8 +518,10 @@ public class Repository {
 
             if (id_head.equals(id_sp)){
                 if (!id_other.equals("")){
+                    //rewrite the file
                     rewriteFile.add(file);
                 }else {
+                    // remove the file
                     removeFile.add(file);
                 }
 
@@ -546,24 +548,25 @@ public class Repository {
             }
         }
 
-        if (!conflictFile.isEmpty()){
-            for (String file :conflictFile ) {
-                String id_head= headCommitFromHead.getBlobs().getOrDefault(file,"");
-                String id_other = headCommitFromBranch.getBlobs().getOrDefault(file,"");
-                String headContent= readContentFromBlob(id_head);
-                String otherContent =readContentFromBlob(id_head);
+        if (!conflictFile.isEmpty()) {
+            for (String file : conflictFile) {
+                String id_head = headCommitFromHead.getBlobs().getOrDefault(file, "");
+                String id_other = headCommitFromBranch.getBlobs().getOrDefault(file, "");
+                String headContent = readContentFromBlob(id_head);
+                String otherContent = readContentFromBlob(id_head);
 
-               StringBuffer sb=new StringBuffer();
-               sb.append("<<<<<<< HEAD\n");
-               sb.append(headContent.equals("")? headContent: headContent+"\n");
-               sb.append("=======\n");
-               sb.append(otherContent.equals("") ? otherContent : otherContent + "\n");
-               sb.append(">>>>>>>\n");
+                StringBuffer sb = new StringBuffer();
+                sb.append("<<<<<<< HEAD\n");
+                sb.append(headContent.equals("") ? headContent : headContent + "\n");
+                sb.append("=======\n");
+                sb.append(otherContent.equals("") ? otherContent : otherContent + "\n");
+                sb.append(">>>>>>>\n");
 
-               File filename =join(CWD,file);
-               writeContents(filename,sb.toString());
-               System.out.println("Encountered a merge conflict.");
+                File filename = join(CWD, file);
+                writeContents(filename, sb.toString());
+                System.out.println("Encountered a merge conflict.");
             }
+        }
 
             //Commit the new merge
             String message = "Merged " + branchName + " into " + readContentsAsString(Head) + ".";
@@ -584,7 +587,7 @@ public class Repository {
             String branchesName= readContentsAsString(Head);
             writeContents(join(Branch,branchesName),commit.getId());
 
-        }
+
 
 
 
