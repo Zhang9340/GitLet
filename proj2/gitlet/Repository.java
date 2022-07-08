@@ -553,7 +553,7 @@ public class Repository {
                 String id_head = headCommitFromHead.getBlobs().getOrDefault(file, "");
                 String id_other = headCommitFromBranch.getBlobs().getOrDefault(file, "");
                 String headContent = readContentFromBlob(id_head);
-                String otherContent = readContentFromBlob(id_head);
+                String otherContent = readContentFromBlob(id_other);
 
                 StringBuffer sb = new StringBuffer();
                 sb.append("<<<<<<< HEAD\n");
@@ -740,8 +740,8 @@ public class Repository {
         if (blobId.equals("")){
             return "";
         }
-        File file =join(BLOBS_DIR,blobId);
-        return readContentsAsString(file);
+        Blobs blobs = getBlobsFromFile(blobId);
+        return blobs.getContentAsString();
 
     }
 
