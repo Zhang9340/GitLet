@@ -267,9 +267,9 @@ public class Repository {
        if (blobId.equals("")){
            System.out.println("File does not exist in that commit.");
        }else {
-           Blobs blobs= getBlobsFromFile(blobId);
-           String content =blobs.getContentAsString();
-           File checkedFile =join(CWD,filename);
+           Blobs blobs = getBlobsFromFile(blobId);
+           String content = blobs.getContentAsString();
+           File checkedFile = join(CWD,filename);
            writeContents(checkedFile,content);
        }
    }
@@ -558,10 +558,10 @@ public class Repository {
                 String otherContent = readContentFromBlob(id_other);
                 // write the file with both content of the head commit and
                 StringBuffer sb = new StringBuffer();
-                sb.append("<<<<<<< HEAD\n");
+                sb.append("<<<<<<< HEAD").append("\n");
                 //sb.append(headContent.equals("") ? headContent : headContent + "\n");
                 sb.append(headContent).append("\n");
-                sb.append("=======\n");
+                sb.append("=======").append("\n");
                 //sb.append(otherContent.equals("") ? otherContent : otherContent + System.lineSeparator());
                 if (!otherContent.equals(""))
                  {
