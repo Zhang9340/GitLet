@@ -560,7 +560,7 @@ public class Repository {
                 sb.append(headContent.equals("") ? headContent : headContent + "\n");
                 sb.append("=======\n");
                 sb.append(otherContent.equals("") ? otherContent : otherContent + System.lineSeparator());
-                sb.append(">>>>>>>\n");
+                sb.append(">>>>>>>");
 
                 File filename = join(CWD, file);
                 writeContents(filename, sb.toString());
