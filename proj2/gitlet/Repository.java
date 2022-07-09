@@ -556,7 +556,7 @@ public class Repository {
                 String id_other = headCommitFromBranch.getBlobs().getOrDefault(file, "");
                 String headContent = readContentFromBlob(id_head);
                 String otherContent = readContentFromBlob(id_other);
-
+                // write the file with both content of the head commit and
                 StringBuffer sb = new StringBuffer();
                 sb.append("<<<<<<< HEAD\n");
                 //sb.append(headContent.equals("") ? headContent : headContent + "\n");
@@ -571,7 +571,7 @@ public class Repository {
 
                 File filename = join(CWD, file);
                 writeContents(filename, sb.toString());
-
+                // stage the file
                 add(file);
                 System.out.println("Encountered a merge conflict.");
             }
