@@ -538,10 +538,12 @@ public class Repository {
         if (!rewriteFile.isEmpty()){
             for (String file:rewriteFile
                  ) {
+                //rewirte the file
                 String id_other = headCommitFromBranch.getBlobs().getOrDefault(file,"");
                 Blobs blob = getBlobsFromFile(id_other);
                 File writefile =join(CWD,blob.getFileName());
                 writeContents(writefile,blob.getContent());
+                //stage the file
                 add(blob.getFileName());
 
 
@@ -557,15 +559,23 @@ public class Repository {
 
                 StringBuffer sb = new StringBuffer();
                 sb.append("<<<<<<< HEAD\n");
-                sb.append(headContent.equals("") ? headContent : headContent + "\n");
+                //sb.append(headContent.equals("") ? headContent : headContent + "\n");
+                sb.append(headContent).append("\n");
                 sb.append("=======\n");
-                sb.append(otherContent.equals("") ? otherContent : otherContent + System.lineSeparator());
+                //sb.append(otherContent.equals("") ? otherContent : otherContent + System.lineSeparator());
+                if (!otherContent.equals(""))
+                 {
+                   sb.append(otherContent).append("\n");
+                 }
                 sb.append(">>>>>>>");
 
                 File filename = join(CWD, file);
                 writeContents(filename, sb.toString());
+
+                add(file);
                 System.out.println("Encountered a merge conflict.");
             }
+
         }
 
             //Commit the new merge
